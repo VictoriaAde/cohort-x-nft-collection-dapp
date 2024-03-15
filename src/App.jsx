@@ -5,7 +5,7 @@ import Header from "./component/Header";
 import AppTabs from "./component/AppTabs";
 import useCollections from "./hooks/useCollections";
 import useMyNfts from "./hooks/useMyNfts";
-import Popup from "./component/Popup";
+import Modal from "./component/Modal";
 import useMint from "./hooks/useMint";
 import useNewOwner from "./hooks/useNewOwner";
 
@@ -65,7 +65,7 @@ function App() {
                       >
                         OpeaSea
                       </a>
-                      <Popup
+                      <Modal
                         className="mt-2"
                         Transfer={<Text>Transfer</Text>}
                         id={x.data[index]}
