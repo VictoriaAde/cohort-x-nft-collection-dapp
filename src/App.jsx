@@ -5,20 +5,22 @@ import Header from "./component/Header";
 import AppTabs from "./component/AppTabs";
 import useCollections from "./hooks/useCollections";
 import useMyNfts from "./hooks/useMyNfts";
+import Popup from "./component/Popup";
+import useMint from "./hooks/useMint";
+import useNewOwner from "./hooks/useNewOwner";
 
 configureWeb3Modal();
 
 function App() {
+  useNewOwner();
   const tokensData = useCollections();
-  // const myTokenIds = useMyNfts();
   const {
     data: { data, address },
     isMintedId,
   } = useMyNfts();
+  const handleMint = useMint();
 
   const myTokensData = tokensData.filter((x, index) => data.includes(index));
-
-  console.log("myTokensData", myTokensData);
 
   const tokens = tokensData.map((x, index) => ({
     ...x,
@@ -26,11 +28,9 @@ function App() {
     add: address,
   }));
 
-  console.log(address);
-
   const mytokens = myTokensData.map((x) => ({
     ...x,
-    isMintedId,
+    data,
   }));
 
   return (
@@ -43,30 +43,33 @@ function App() {
               {myTokensData.length === 0 ? (
                 <Text>No NFT owned yet</Text>
               ) : (
-                mytokens.map((data, index) => (
-                  <Box key={data.dna} className="w-[20rem]">
+                mytokens.map((x, index) => (
+                  <Box key={x.dna} className="w-[20rem]">
                     <img
-                      src={data.image}
+                      src={x.image}
                       className="w-full object-contain"
-                      alt={data.name}
+                      alt={x.name}
                     />
-                    <Text className="block text-2xl">Name: {data.name}</Text>
-                    <Text className="block">
-                      Description: {data.description}
-                    </Text>
-
-                    <Flex direction="column" gap="2">
+                    <Text className="block text-2xl">Name: {x.name}</Text>
+                    <Text className="block">Description: {x.description}</Text>
+                    <Flex
+                      direction="column"
+                      gap="2"
+                      style={{ marginBottom: "2rem" }}
+                    >
                       <a
-                        className="px-4 py-2 text-lg mt-2 bg-blue-700 text-white rounded-lg"
+                        className="px-2 py-1 text-lg mt-2 bg-blue-700 text-white rounded-lg"
                         href={`${import.meta.env.VITE_opeasea_base_url}${
-                          data.isMintedId[index]
+                          x.data[index]
                         }`}
                       >
-                        View NFT on Opensea
+                        OpeaSea
                       </a>
-                      <Button className="px-8 py-2 text-xl mt-2">
-                        Transfer
-                      </Button>
+                      <Popup
+                        className="mt-2"
+                        Transfer={<Text>Transfer</Text>}
+                        id={x.data[index]}
+                      />
                     </Flex>
                   </Box>
                 ))
@@ -89,7 +92,6 @@ function App() {
                     <Text className="block">
                       Description: {item.description}
                     </Text>
-
                     {item.isMinted ? (
                       <Flex direction="column" gap="2">
                         <a
@@ -98,7 +100,7 @@ function App() {
                             import.meta.env.VITE_opeasea_base_url
                           }${index}`}
                         >
-                          see on OpeaSea
+                          OpeaSea
                         </a>
                         <Text>
                           {`${item.add[index]?.slice(0, 7)}...${item.add[
@@ -107,7 +109,12 @@ function App() {
                         </Text>
                       </Flex>
                     ) : (
-                      <Button className="px-8 py-2 text-xl mt-2">Mint</Button>
+                      <Button
+                        className="px-8 py-2 text-xl mt-2"
+                        onClick={() => handleMint(index)}
+                      >
+                        Mint
+                      </Button>
                     )}
                   </Box>
                 ))
