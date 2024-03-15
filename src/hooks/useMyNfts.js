@@ -7,7 +7,14 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 
 const useMyNfts = () => {
     const { address } = useWeb3ModalAccount();
-    const [data, setData] = useState([]);
+    // const [data, setData] = useState([]);
+
+    const [data, setData] = useState({
+        address: [],
+        data: [],
+    });
+    const [isMintedId, setIsMintedId] = useState([]);
+
     const tokenIDs = useMemo(
         () => [...Array.from({ length: 30 })].map((_, index) => index),
         []
@@ -41,6 +48,8 @@ const useMyNfts = () => {
                 return false;
             });
 
+            setIsMintedId(validResponsesIndex);
+
             const decodedResponses = validResponses.map((x) =>
                 itf.decodeFunctionResult("ownerOf", x[1])
             );
@@ -48,6 +57,13 @@ const useMyNfts = () => {
             const ownedTokenIds = [];
 
             decodedResponses.forEach((addr, index) => {
+                tokenIDs.indexOf(validResponsesIndex[index]);
+
+                if (index !== -1) {
+                    tokenIDs[validResponsesIndex[index]] =
+                        String(addr).toLowerCase();
+                }
+
                 if (
                     String(addr).toLowerCase() === String(address).toLowerCase()
                 )
@@ -55,8 +71,13 @@ const useMyNfts = () => {
             });
 
             setData(ownedTokenIds);
+            setData((prev) => ({
+                ...prev,
+                address: tokenIDs,
+                data: ownedTokenIds,
+            }));
         })();
-    }, [address, tokenIDs]);
+    }, [isMintedId, address, tokenIDs]);
 
     return data;
 };

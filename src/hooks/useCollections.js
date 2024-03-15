@@ -10,11 +10,17 @@ const useCollections = () => {
                 (_, index) => index
             );
 
-            const promises = tokenIDs.map((x) =>
-                fetch(`${import.meta.env.VITE_token_base_url}/${x}`)
+            // console.log("tokenIDs", tokenIDs);
+
+            const promises = tokenIDs.map((index) =>
+                fetch(`${import.meta.env.VITE_token_base_url}${index}`)
             );
 
+            // console.log("promises", promises);
+
             const tokensMetadataResponse = await Promise.all(promises);
+
+            // console.log(" tokensMetadataResponse", tokensMetadataResponse);
 
             const tokensMetadataJson = [];
 
@@ -22,6 +28,8 @@ const useCollections = () => {
                 const json = await tokensMetadataResponse[i].json();
                 tokensMetadataJson.push(json);
             }
+
+            // console.log("tokensMetadataJson", tokensMetadataJson);
 
             setData(tokensMetadataJson);
         })();
